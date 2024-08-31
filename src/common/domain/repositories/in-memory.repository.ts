@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { NotFoundError } from '../errors/not-found-error'
 import {
   RepositoryInterface,
@@ -21,23 +22,35 @@ export abstract class InMemoryRepository<Model extends ModelProps>
   sortableFields: string[] = []
 
   create(props: CreateProps): Model {
-    throw new Error('Method not implemented.')
+    const model = {
+      id: randomUUID(),
+      create_at: new Date(),
+      updated_at: new Date(),
+      ...props,
+    }
+    return model as unknown as Model
   }
 
-  insert(model: Model): Promise<Model> {
-    throw new Error('Method not implemented.')
+  async insert(model: Model): Promise<Model> {
+    this.items.push(model)
+    return model
   }
 
   async findById(id: string): Promise<Model> {
     return this._get(id)
   }
 
-  update(model: Model): Promise<Model> {
-    throw new Error('Method not implemented.')
+  async update(model: Model): Promise<Model> {
+    await this._get(model.id)
+    const index = this.items.findIndex(item => item.id === model.id)
+    this.items[index] = model
+    return model
   }
 
-  delete(id: string): Promise<void> {
-    throw new Error('Method not implemented.')
+  async delete(id: string): Promise<void> {
+    await this._get(id)
+    const index = this.items.findIndex(item => item.id === id)
+    this.items.splice(index, 1)
   }
 
   search(props: SearchInput): Promise<SearchOutput<Model>> {
