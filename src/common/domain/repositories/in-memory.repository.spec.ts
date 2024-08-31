@@ -75,4 +75,23 @@ describe('InMemoryRepository unit tests', () => {
     const result = await sut.findById(data.id)
     expect(result).toStrictEqual(data)
   })
+
+  it('should throw error when id not found', async () => {
+    await expect(sut.update(model)).rejects.toThrow(
+      new NotFoundError(`Model not found using ID ${model.id}`),
+    )
+  })
+
+  it('should update an model', async () => {
+    const data = await sut.insert(model)
+    const modelUpdated = {
+      id: data.id,
+      name: 'updated name',
+      price: 2000,
+      created_at,
+      updated_at,
+    }
+    const result = await sut.update(modelUpdated)
+    expect(result).toStrictEqual(sut.items[0])
+  })
 })
