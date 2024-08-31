@@ -53,8 +53,64 @@ export abstract class InMemoryRepository<Model extends ModelProps>
     this.items.splice(index, 1)
   }
 
-  search(props: SearchInput): Promise<SearchOutput<Model>> {
-    throw new Error('Method not implemented.')
+  async search(props: SearchInput): Promise<SearchOutput<Model>> {
+    const page = props.page ?? 1
+    const per_page = props.per_page ?? 15
+    const sort = props.sort ?? null
+    const sort_dir = props.sort_dir ?? null
+    const filter = props.filter ?? null
+
+    const filteredItems = await this.applyFilter(this.items, filter)
+    const orderedItems = await this.applySort(filteredItems, sort, sort_dir)
+    const paginatedItems = await this.applyPaginate(
+      orderedItems,
+      page,
+      per_page,
+    )
+    return {
+      items: paginatedItems,
+      total: filteredItems.length,
+      current_page: page,
+      per_page,
+      sort,
+      sort_dir,
+      filter,
+    }
+  }
+
+  protected abstract applyFilter(
+    items: Model[],
+    filter: string | null,
+  ): Promise<Model[]>
+
+  protected async applySort(
+    items: Model[],
+    sort: string | null,
+    sort_dir: string | null,
+  ): Promise<Model[]> {
+    if (!sort || !this.sortableFields.includes(sort)) {
+      return items
+    }
+
+    return [...items].sort((a, b) => {
+      if (a[sort] < b[sort]) {
+        return sort_dir === 'asc' ? -1 : 1
+      }
+      if (a[sort] > b[sort]) {
+        return sort_dir === 'asc' ? 1 : -1
+      }
+      return 0
+    })
+  }
+
+  protected async applyPaginate(
+    items: Model[],
+    page: number,
+    per_page: number,
+  ): Promise<Model[]> {
+    const start = (page - 1) * per_page
+    const limit = start + per_page
+    return items.slice(start, limit)
   }
 
   protected async _get(id: string): Promise<Model> {
