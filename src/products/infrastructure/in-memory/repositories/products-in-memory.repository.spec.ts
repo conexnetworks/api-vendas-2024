@@ -70,4 +70,35 @@ describe('ProductsInMemoryRepository unit tests', () => {
       expect(result).toStrictEqual([items[0], items[1]])
     })
   })
+
+  describe('applySort', () => {
+    it('should sort items by created_at when sort param is null', async () => {
+      const created_at = new Date()
+      const items = [
+        ProductsDataBuilder({ name: 'c', created_at: created_at }),
+        ProductsDataBuilder({
+          name: 'a',
+          created_at: new Date(created_at.getTime() + 100),
+        }),
+        ProductsDataBuilder({
+          name: 'b',
+          created_at: new Date(created_at.getTime() + 200),
+        }),
+      ]
+      sut.items.push(...items)
+      const result = await sut['applySort'](sut.items, null, null)
+      expect(result).toStrictEqual([items[2], items[1], items[0]])
+    })
+
+    it('should sort items by name field', async () => {
+      const items = [
+        ProductsDataBuilder({ name: 'c' }),
+        ProductsDataBuilder({ name: 'a' }),
+        ProductsDataBuilder({ name: 'b' }),
+      ]
+      sut.items.push(...items)
+      const result = await sut['applySort'](sut.items, 'name', 'desc')
+      expect(result).toStrictEqual([items[0], items[2], items[1]])
+    })
+  })
 })
