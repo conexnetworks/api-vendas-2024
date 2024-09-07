@@ -46,4 +46,28 @@ describe('ProductsInMemoryRepository unit tests', () => {
       await sut.conflictingName('Curso nodejs')
     })
   })
+
+  describe('applyFilter', () => {
+    it('should no filter items when filter param is null', async () => {
+      const data = ProductsDataBuilder({})
+      sut.items.push(data)
+      const spyFilterMethod = jest.spyOn(sut.items, 'filter' as any)
+      const result = await sut['applyFilter'](sut.items, null)
+      expect(spyFilterMethod).not.toHaveBeenCalled()
+      expect(result).toStrictEqual(sut.items)
+    })
+
+    it('should filter the data using filter param', async () => {
+      const items = [
+        ProductsDataBuilder({ name: 'Test' }),
+        ProductsDataBuilder({ name: 'TEST' }),
+        ProductsDataBuilder({ name: 'fake' }),
+      ]
+      sut.items.push(...items)
+      const spyFilterMethod = jest.spyOn(sut.items, 'filter' as any)
+      const result = await sut['applyFilter'](sut.items, 'TEST')
+      expect(spyFilterMethod).toHaveBeenCalledTimes(1)
+      expect(result).toStrictEqual([items[0], items[1]])
+    })
+  })
 })
