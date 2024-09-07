@@ -17,6 +17,6 @@ export type CreateProductProps = {
 export interface ProductsRepository
   extends RepositoryInterface<ProductModel, CreateProductProps> {
   findByName(name: string): Promise<ProductModel>
-  findAllByIds(ids: ProductId[]): Promise<ProductModel[]>
+  findAllByIds(productIds: ProductId[]): Promise<ProductModel[]>
   conflictingName(name: string): Promise<void>
 }
