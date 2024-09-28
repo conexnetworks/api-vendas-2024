@@ -21,8 +21,12 @@ export class ProductsTypeormRepository implements ProductsRepository {
     this.productsRepository = dataSource.getRepository(Product)
   }
 
-  findByName(name: string): Promise<ProductModel> {
-    throw new Error('Method not implemented.')
+  async findByName(name: string): Promise<ProductModel> {
+    const product = await this.productsRepository.findOneBy({ name })
+    if (!product) {
+      throw new NotFoundError(`Product not found using name ${name}`)
+    }
+    return product
   }
 
   findAllByIds(productIds: ProductId[]): Promise<ProductModel[]> {
