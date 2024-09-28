@@ -75,4 +75,26 @@ describe('ProductsTypeormRepository integration tests', () => {
       expect(result.name).toEqual('nome atualizado')
     })
   })
+
+  describe('delete', () => {
+    it('should generate an error when the product is not found', async () => {
+      const id = randomUUID()
+      await expect(ormRepository.delete(id)).rejects.toThrow(
+        new NotFoundError(`Product not found using ID ${id}`),
+      )
+    })
+
+    it('should delete a product', async () => {
+      const data = ProductsDataBuilder({})
+      const product = testDataSource.manager.create(Product, data)
+      await testDataSource.manager.save(product)
+
+      await ormRepository.delete(data.id)
+
+      const result = await testDataSource.manager.findOneBy(Product, {
+        id: data.id,
+      })
+      expect(result).toBeNull()
+    })
+  })
 })
