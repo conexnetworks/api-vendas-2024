@@ -5,6 +5,8 @@ import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { randomUUID } from 'crypto'
 import { ProductsDataBuilder } from '../../testing/helpers/products-data-builder'
 import { ConflictError } from '@/common/domain/errors/conflict-error'
+import { ProductModel } from '@/products/domain/models/products.model'
+import exp from 'constants'
 
 describe('ProductsTypeormRepository integration tests', () => {
   let ormRepository: ProductsTypeormRepository
@@ -172,6 +174,33 @@ describe('ProductsTypeormRepository integration tests', () => {
 
       expect(result.total).toEqual(16)
       expect(result.items.length).toEqual(15)
+    })
+
+    it('should order by created_at DESC when search params are null', async () => {
+      const created_at = new Date()
+      const models: ProductModel[] = []
+      const arrange = Array(16).fill(ProductsDataBuilder({}))
+      arrange.forEach((element, index) => {
+        delete element.id
+        models.push({
+          ...element,
+          name: `Product ${index}`,
+          created_at: new Date(created_at.getTime() + index),
+        })
+      })
+      const data = testDataSource.manager.create(Product, models)
+      await testDataSource.manager.save(data)
+
+      const result = await ormRepository.search({
+        page: 1,
+        per_page: 15,
+        sort: null,
+        sort_dir: null,
+        filter: null,
+      })
+
+      expect(result.items[0].name).toEqual('Product 15')
+      expect(result.items[14].name).toEqual('Product 1')
     })
   })
 })
