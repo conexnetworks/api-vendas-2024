@@ -97,4 +97,22 @@ describe('ProductsTypeormRepository integration tests', () => {
       expect(result).toBeNull()
     })
   })
+
+  describe('findByName', () => {
+    it('should generate an error when the product is not found', async () => {
+      const name = 'Product 1'
+      await expect(ormRepository.findByName(name)).rejects.toThrow(
+        new NotFoundError(`Product not found using name ${name}`),
+      )
+    })
+
+    it('should finds a product by name', async () => {
+      const data = ProductsDataBuilder({ name: 'Product 1' })
+      const product = testDataSource.manager.create(Product, data)
+      await testDataSource.manager.save(product)
+
+      const result = await ormRepository.findByName(data.name)
+      expect(result.name).toEqual('Product 1')
+    })
+  })
 })
