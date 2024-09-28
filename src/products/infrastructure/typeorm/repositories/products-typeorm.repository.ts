@@ -12,6 +12,7 @@ import { Repository } from 'typeorm'
 import { Product } from '../entities/products.entity'
 import { dataSource } from '@/common/infrastructure/typeorm'
 import { NotFoundError } from '@/common/domain/errors/not-found-error'
+import { ConflictError } from '@/common/domain/errors/conflict-error'
 
 export class ProductsTypeormRepository implements ProductsRepository {
   sortableFields: string[] = ['name', 'created_at']
@@ -33,8 +34,11 @@ export class ProductsTypeormRepository implements ProductsRepository {
     throw new Error('Method not implemented.')
   }
 
-  conflictingName(name: string): Promise<void> {
-    throw new Error('Method not implemented.')
+  async conflictingName(name: string): Promise<void> {
+    const product = await this.productsRepository.findOneBy({ name })
+    if (product) {
+      throw new ConflictError(`Name already used by another product`)
+    }
   }
 
   create(props: CreateProductProps): ProductModel {
