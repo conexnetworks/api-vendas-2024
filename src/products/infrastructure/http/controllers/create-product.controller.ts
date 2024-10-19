@@ -1,9 +1,6 @@
 import { AppError } from '@/common/domain/errors/app-error'
 import { Request, Response } from 'express'
 import { z } from 'zod'
-import { ProductsTypeormRepository } from '../../typeorm/repositories/products-typeorm.repository'
-import { dataSource } from '@/common/infrastructure/typeorm'
-import { Product } from '../../typeorm/entities/products.entity'
 import { CreateProductUseCase } from '@/products/application/usecases/create-product.usecase'
 import { container } from 'tsyringe'
 
