@@ -6,7 +6,6 @@ import { randomUUID } from 'crypto'
 import { ProductsDataBuilder } from '../../testing/helpers/products-data-builder'
 import { ConflictError } from '@/common/domain/errors/conflict-error'
 import { ProductModel } from '@/products/domain/models/products.model'
-import exp from 'constants'
 
 describe('ProductsTypeormRepository integration tests', () => {
   let ormRepository: ProductsTypeormRepository
@@ -167,13 +166,14 @@ describe('ProductsTypeormRepository integration tests', () => {
       const result = await ormRepository.search({
         page: 1,
         per_page: 15,
-        sort: null,
+        sort: 'fake',
         sort_dir: null,
         filter: null,
       })
 
       expect(result.total).toEqual(16)
       expect(result.items.length).toEqual(15)
+      expect(result.sort).toEqual('created_at')
     })
 
     it('should order by created_at DESC when search params are null', async () => {
@@ -201,6 +201,44 @@ describe('ProductsTypeormRepository integration tests', () => {
 
       expect(result.items[0].name).toEqual('Product 15')
       expect(result.items[14].name).toEqual('Product 1')
+    })
+
+    it('should apply paginate and sort', async () => {
+      const created_at = new Date()
+      const models: ProductModel[] = []
+      'badec'.split('').forEach((element, index) => {
+        models.push({
+          ...ProductsDataBuilder({}),
+          name: element,
+          created_at: new Date(created_at.getTime() + index),
+        })
+      })
+      const data = testDataSource.manager.create(Product, models)
+      await testDataSource.manager.save(data)
+
+      let result = await ormRepository.search({
+        page: 1,
+        per_page: 2,
+        sort: 'name',
+        sort_dir: 'ASC',
+        filter: null,
+      })
+
+      expect(result.items[0].name).toEqual('a')
+      expect(result.items[1].name).toEqual('b')
+      expect(result.items.length).toEqual(2)
+
+      result = await ormRepository.search({
+        page: 1,
+        per_page: 2,
+        sort: 'name',
+        sort_dir: 'DESC',
+        filter: null,
+      })
+
+      expect(result.items[0].name).toEqual('e')
+      expect(result.items[1].name).toEqual('d')
+      expect(result.items.length).toEqual(2)
     })
   })
 })
