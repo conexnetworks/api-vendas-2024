@@ -17,3 +17,21 @@ Todos os recursos externos (HTTP, mensageria, email, banco de dados, etc) se rel
 A ideia é criarmos os casos de uso na camada `application` exatamente por ser a estrutura responsável por tratar as regras de aplicação.
 
 > Alguns desenvolvedores preferem criar os casos de uso na camada de dominio.
+
+
+## Configurando os serviços de produtos
+
+Criaremos cada caso de uso seguindo o princípio de `Single Responsability` do SOLID, que implica em criação de classes com apenas uma responsabilidade.
+
+Outro ponto importante para a implementação de um caso de uso é a definição de quais dados devem ser recebidos para que o processamento aconteça. A mesma coisa devemos considerar no retorno da informação que foi criada. Devemos converter a entidade criada em uma estrutura específica, para que seja enviada como dados de retorno.
+
+### Implementação dos casos de usos para produtos
+
+*Requisitos que precisam ser atendidos:*
+
+- O nome do produto é obrigatório.
+- O preço do produto é obrigatório.
+- A quantidade do produto é obrigatória.
+- Não pode cadastrar um produto com nome igual ao de outro produto.
+
+E para persistir os dados precisaremos de um repositório. Como devemos considerar qualquer tipo de estrutura de dados sendo usada para essa operação (memoria, mysql, mongodb, etc), usaremos o método construtor para injetar o repositório como uma dependencia da nossa classe do caso de uso.
