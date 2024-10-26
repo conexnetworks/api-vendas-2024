@@ -1,7 +1,6 @@
 import { ProductsRepository } from '@/products/domain/repositories/products.repository'
 import { inject, injectable } from 'tsyringe'
 import { ProductOutput } from '../dtos/product-output.dto'
-import { ConflictError } from '@/common/domain/errors/conflict-error'
 
 export namespace UpdateProductUseCase {
   export type Input = {
