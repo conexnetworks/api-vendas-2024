@@ -26,9 +26,6 @@ export namespace AuthenticateUserUseCase {
       }
 
       const user = await this.usersRepository.findByEmail(input.email)
-      if (!user) {
-        throw new InvalidCredentialsError('Invalid credentials')
-      }
 
       const passwordMatch = await this.hashProvider.compareHash(
         input.password,
