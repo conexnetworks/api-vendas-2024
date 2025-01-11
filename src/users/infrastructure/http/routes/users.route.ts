@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { createUserController } from '../controllers/create-user.controller'
+import { searchUserController } from '../controllers/search-user.controller'
 
 const usersRouter = Router()
 
@@ -79,5 +80,7 @@ const usersRouter = Router()
  *         description: Email already used on another user
  */
 usersRouter.post('/', createUserController)
+
+usersRouter.get('/', searchUserController)
 
 export { usersRouter }
