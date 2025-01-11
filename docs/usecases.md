@@ -35,3 +35,16 @@ Outro ponto importante para a implementação de um caso de uso é a definição
 - Não pode cadastrar um produto com nome igual ao de outro produto.
 
 E para persistir os dados precisaremos de um repositório. Como devemos considerar qualquer tipo de estrutura de dados sendo usada para essa operação (memoria, mysql, mongodb, etc), usaremos o método construtor para injetar o repositório como uma dependencia da nossa classe do caso de uso.
+
+## Configurando os serviços de usuários
+
+### Implementação dos casos de usos para usuários
+
+*Requisitos que precisam ser atendidos:*
+
+- O nome é obrigatório.
+- O email é obrigatório.
+- Não pode cadastrar um usuario com email igual ao de outro usuario.
+- A senha é obrigatória.
+- A senha deve ser armazenada com criptografia.
+- O campo avatar é opcional e será preenchido através de uma rota específica de atualização.
