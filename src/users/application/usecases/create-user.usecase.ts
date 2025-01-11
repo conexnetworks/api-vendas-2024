@@ -2,7 +2,6 @@ import { inject, injectable } from 'tsyringe'
 import { UserOutput } from '../dtos/user-output.dto'
 import { UsersRepository } from '@/users/domain/repositories/users.repository'
 import { BadRequestError } from '@/common/domain/errors/bad-request-error'
-import { Hash } from 'crypto'
 import { HashProvider } from '@/common/domain/providers/hash-provider'
 
 export namespace CreateUserUseCase {
