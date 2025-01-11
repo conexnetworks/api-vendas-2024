@@ -15,6 +15,8 @@ const envSchema = z.object({
   DB_NAME: z.string().default('postgres'),
   DB_USER: z.string().default('postgres'),
   DB_PASS: z.string().default('postgres'),
+  JWT_SECRET: z.string(),
+  JWT_EXPIRES_IN: z.coerce.number().default(86400),
 })
 
 const _env = envSchema.safeParse(process.env)
