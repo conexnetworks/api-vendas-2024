@@ -79,7 +79,7 @@ export class UsersTypeormRepository implements UsersRepository {
     const [users, total] = await this.usersRepository.findAndCount({
       ...(props.filter && {
         where: {
-          name: ILike(props.filter),
+          name: ILike(`%${props.filter}%`),
         },
       }),
       order: {
