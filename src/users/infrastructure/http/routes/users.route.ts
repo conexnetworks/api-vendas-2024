@@ -2,27 +2,9 @@ import { Router } from 'express'
 import { createUserController } from '../controllers/create-user.controller'
 import { searchUserController } from '../controllers/search-user.controller'
 import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuthenticated'
-import multer from 'multer'
-import { BadRequestError } from '@/common/domain/errors/bad-request-error'
+import { upload } from '../middlewares/uploadAvatar'
 
 const usersRouter = Router()
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 1024 * 1024 * 3,
-  },
-  fileFilter: (request, file, callback) => {
-    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-
-    if (!allowedMimes.includes(file.mimetype)) {
-      callback(
-        new BadRequestError('.jpg, .jpeg, .png and .webp files are accepted'),
-      )
-    }
-    callback(null, true)
-  },
-})
 
 /**
  * @swagger
@@ -180,6 +162,37 @@ usersRouter.post('/', createUserController)
  */
 usersRouter.get('/', isAuthenticated, searchUserController)
 
+/**
+ * @swagger
+ * /users/avatar:
+ *   patch:
+ *     summary: Upload an image for a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *                 format: uuid
+ *                 description: The user id
+ *               file:
+ *                 type: file
+ *                 format: binary
+ *                 description: The image file to upload
+ *     responses:
+ *       200:
+ *         description: The image was successfully uploaded
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: Some server error
+ */
 usersRouter.patch(
   '/avatar',
   isAuthenticated,
