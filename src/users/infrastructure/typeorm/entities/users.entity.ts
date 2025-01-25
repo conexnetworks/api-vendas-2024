@@ -1,4 +1,6 @@
+import { env } from '@/common/infrastructure/env'
 import { UserModel } from '@/users/domain/models/users.model'
+import { Exclude, Expose } from 'class-transformer'
 import {
   Column,
   CreateDateColumn,
@@ -19,6 +21,7 @@ export class User implements UserModel {
   email: string
 
   @Column()
+  @Exclude()
   password: string
 
   @Column()
@@ -29,4 +32,10 @@ export class User implements UserModel {
 
   @UpdateDateColumn()
   updated_at: Date
+
+  @Expose({ name: 'avatar_url' })
+  getAvatarUrl() {
+    if (!this.avatar) return null
+    return `${env.CLOUDFLARE_R2_URL}/${this.avatar}`
+  }
 }

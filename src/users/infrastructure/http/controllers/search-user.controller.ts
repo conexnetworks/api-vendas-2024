@@ -3,6 +3,7 @@ import { container } from 'tsyringe'
 import { z } from 'zod'
 import { dataValidation } from '@/common/infrastructure/validation/zod'
 import { SearchUserUseCase } from '@/users/application/usecases/search-user.usecase'
+import { instanceToInstance } from 'class-transformer'
 
 export async function searchUserController(
   request: Request,
@@ -31,5 +32,5 @@ export async function searchUserController(
     filter: filter ?? null,
   })
 
-  return response.status(200).json(users)
+  return response.status(200).json(instanceToInstance(users))
 }
