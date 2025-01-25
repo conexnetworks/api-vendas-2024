@@ -2,8 +2,27 @@ import { Router } from 'express'
 import { createUserController } from '../controllers/create-user.controller'
 import { searchUserController } from '../controllers/search-user.controller'
 import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuthenticated'
+import multer from 'multer'
+import { BadRequestError } from '@/common/domain/errors/bad-request-error'
 
 const usersRouter = Router()
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 1024 * 1024 * 3,
+  },
+  fileFilter: (request, file, callback) => {
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+
+    if (!allowedMimes.includes(file.mimetype)) {
+      callback(
+        new BadRequestError('.jpg, .jpeg, .png and .webp files are accepted'),
+      )
+    }
+    callback(null, true)
+  },
+})
 
 /**
  * @swagger
@@ -114,8 +133,6 @@ const usersRouter = Router()
  */
 usersRouter.post('/', createUserController)
 
-usersRouter.use(isAuthenticated)
-
 /**
  * @swagger
  * /users:
@@ -161,6 +178,13 @@ usersRouter.use(isAuthenticated)
  *             schema:
  *               $ref: '#/components/schemas/UserListResponse'
  */
-usersRouter.get('/', searchUserController)
+usersRouter.get('/', isAuthenticated, searchUserController)
+
+usersRouter.patch(
+  '/avatar',
+  isAuthenticated,
+  upload.single('file'),
+  searchUserController,
+)
 
 export { usersRouter }
