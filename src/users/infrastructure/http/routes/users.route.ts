@@ -3,6 +3,7 @@ import { createUserController } from '../controllers/create-user.controller'
 import { searchUserController } from '../controllers/search-user.controller'
 import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuthenticated'
 import { upload } from '../middlewares/uploadAvatar'
+import { updateAvatarController } from '../controllers/update-avatar.controller'
 
 const usersRouter = Router()
 
@@ -197,7 +198,7 @@ usersRouter.patch(
   '/avatar',
   isAuthenticated,
   upload.single('file'),
-  searchUserController,
+  updateAvatarController,
 )
 
 export { usersRouter }
