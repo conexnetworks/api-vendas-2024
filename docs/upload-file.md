@@ -46,3 +46,16 @@ E isso pode ficar bem caro caso você tenha uma aplicação que faz upload de ar
 O `Cloudflare R2` funciona da mesma maneira que o Amazon S3 para armazenamento de arquivos, só que ele não cobra taxa de egressos, ficando bem mais barato que o Amazon S3.
 
 Outra vantagem é que o Cloudflare R2 permite o uso da API do Amazon S3, ou seja, se você em algum momento quiser migrar para o Amazon S3, a implementação será a mesma.
+
+### Implementação do Uploader com o Multer e o SDK Client S3 da Amazon
+
+[SDK do Client S3](https://docs.aws.amazon.com/pt_br/sdk-for-javascript/v3/developer-guide/getting-started-nodejs.html)
+
+Instalar o Multer e a SDK do Client S3 para criar a implementação do upload de imagens para avatar de usuários.
+
+```shell
+npm install multer @aws-sdk/client-s3
+
+npm install @types/multer -D
+```
+
