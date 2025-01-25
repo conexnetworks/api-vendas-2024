@@ -1,4 +1,4 @@
-export class UserTokens {
+export interface UserTokensModel {
   id: string
   token: string
   user_id: string
