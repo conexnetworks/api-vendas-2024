@@ -38,7 +38,9 @@ export namespace UpdateAvatarUseCase {
       const { user_id, filename, filesize, filetype, body } = input
 
       if (!ACCEPTED_IMAGE_TYPES.includes(filetype)) {
-        throw new BadRequestError('Invalid file type')
+        throw new BadRequestError(
+          '.jpg, .jpeg, .png and .webp files are accepted',
+        )
       }
 
       if (filesize > MAX_UPLOAD_SIZE) {
