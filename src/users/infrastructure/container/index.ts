@@ -11,6 +11,7 @@ import { UserToken } from '../typeorm/entities/user-tokens.entity'
 import { SendEmailToResetPasswordUseCase } from '@/users/application/usecases/send-email-to-reset-password.usecase'
 import { ResetPasswordUseCase } from '@/users/application/usecases/reset-password.usecase'
 import { GetUserUseCase } from '@/users/application/usecases/get-user.usecase'
+import { UpdateUserUseCase } from '@/users/application/usecases/update-user.usecase'
 
 container.registerSingleton('UsersRepository', UsersTypeormRepository)
 container.registerInstance(
@@ -38,3 +39,4 @@ container.registerSingleton(
   ResetPasswordUseCase.UseCase,
 )
 container.registerSingleton('GetUserUseCase', GetUserUseCase.UseCase)
+container.registerSingleton('UpdateUserUseCase', UpdateUserUseCase.UseCase)
