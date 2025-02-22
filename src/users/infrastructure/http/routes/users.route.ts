@@ -5,6 +5,7 @@ import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuth
 import { upload } from '../middlewares/uploadAvatar'
 import { updateAvatarController } from '../controllers/update-avatar.controller'
 import { getUserController } from '../controllers/get-user.controller'
+import { updateUserController } from '../controllers/update-user.controller'
 
 const usersRouter = Router()
 
@@ -219,5 +220,51 @@ usersRouter.patch(
  *         description: Unauthorized
  */
 usersRouter.get('/profile', isAuthenticated, getUserController)
+
+/**
+ * @swagger
+ * /users/profile:
+ *   put:
+ *     summary: Update the user profile
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The name of the user
+ *               email:
+ *                 type: string
+ *                 description: The email of the user
+ *               old_password:
+ *                 type: string
+ *                 description: The old password of the user
+ *               password:
+ *                 type: string
+ *                 description: The new password of the user
+ *             example:
+ *               name: John Doe
+ *               email: sampleuser@mail.com
+ *               old_password: 1234
+ *               password: 5678
+ *     responses:
+ *       200:
+ *         description: The user profile was successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Input data not provided or invalid
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: The user was not found
+ */
+usersRouter.put('/profile', isAuthenticated, updateUserController)
 
 export { usersRouter }
