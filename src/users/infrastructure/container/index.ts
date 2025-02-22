@@ -8,6 +8,7 @@ import { AuthenticateUserUseCase } from '@/users/application/usecases/authentica
 import { UpdateAvatarUseCase } from '@/users/application/usecases/update-avatar.usecase'
 import { UserTokensTypeormRepository } from '../typeorm/repositories/user-tokens-typeorm.repository'
 import { UserToken } from '../typeorm/entities/user-tokens.entity'
+import { SendEmailToResetPasswordUseCase } from '@/users/application/usecases/send-email-to-reset-password.usecase'
 
 container.registerSingleton('UsersRepository', UsersTypeormRepository)
 container.registerInstance(
@@ -25,4 +26,8 @@ container.registerSingleton('UserTokensRepository', UserTokensTypeormRepository)
 container.registerInstance(
   'UserTokensDefaultRepositoryTypeorm',
   dataSource.getRepository(UserToken),
+)
+container.registerSingleton(
+  'SendEmailToResetPasswordUseCase',
+  SendEmailToResetPasswordUseCase.UseCase,
 )
