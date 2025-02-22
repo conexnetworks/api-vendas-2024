@@ -5,14 +5,12 @@ type TemplateVariablesProps = {
   [key: string]: string | number
 }
 
-type HandlebarsEmailTemplateProps = {
+export type HandlebarsEmailTemplateProps = {
   file: string
   variables: TemplateVariablesProps
 }
 
 export class HandlebarsEmailTemplate {
-  private template: HandlebarsTemplateDelegate
-
   async parse({
     file,
     variables,
