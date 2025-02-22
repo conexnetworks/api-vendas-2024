@@ -4,6 +4,7 @@ import { searchUserController } from '../controllers/search-user.controller'
 import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuthenticated'
 import { upload } from '../middlewares/uploadAvatar'
 import { updateAvatarController } from '../controllers/update-avatar.controller'
+import { getUserController } from '../controllers/get-user.controller'
 
 const usersRouter = Router()
 
@@ -200,5 +201,23 @@ usersRouter.patch(
   upload.single('file'),
   updateAvatarController,
 )
+
+/**
+ * @swagger
+ * /users/profile:
+ *   get:
+ *     summary: Returns the user profile
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: The user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ */
+usersRouter.get('/profile', isAuthenticated, getUserController)
 
 export { usersRouter }
