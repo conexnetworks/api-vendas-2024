@@ -3,6 +3,7 @@ import { SendEmailToResetPasswordUseCase } from '@/users/application/usecases/se
 import { Request, Response } from 'express'
 import { container } from 'tsyringe'
 import { z } from 'zod'
+import { sendMailToResetPassword } from '../../email/nodemailer/sendMailToResetPassword'
 
 export async function sendEmailToResetPasswordController(
   request: Request,
@@ -20,9 +21,9 @@ export async function sendEmailToResetPasswordController(
     email,
   })
 
-  // TODO: recurso para enviar email
-  console.log('user: ', user)
-  console.log('token: ', token)
+  await sendMailToResetPassword({ user, token })
+  // console.log('user: ', user)
+  // console.log('token: ', token)
 
   return response.status(204).json()
 }
