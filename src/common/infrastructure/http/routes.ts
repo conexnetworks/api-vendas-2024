@@ -1,3 +1,4 @@
+import { customersRouter } from '@/customers/infrastructure/http/routes/customers.route'
 import { productsRouter } from '@/products/infrastructure/http/routes/products.route'
 import { authRouter } from '@/users/infrastructure/http/routes/auth.route'
 import { passwordRouter } from '@/users/infrastructure/http/routes/password.route'
@@ -17,5 +18,7 @@ routes.use('/auth', authRouter)
 routes.use('/users', usersRouter)
 
 routes.use('/password', passwordRouter)
+
+routes.use('/customers', customersRouter)
 
 export { routes }
