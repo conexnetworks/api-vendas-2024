@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { createCustomerController } from '../controllers/create-customer.controller'
 import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuthenticated'
+import { searchCustomerController } from '../controllers/search-customer.controller'
 
 const customersRouter = Router()
 
@@ -73,5 +74,7 @@ const customersRouter = Router()
  *         description: Email already used on another customer
  */
 customersRouter.post('/', isAuthenticated, createCustomerController)
+
+customersRouter.get('/', isAuthenticated, searchCustomerController)
 
 export { customersRouter }
