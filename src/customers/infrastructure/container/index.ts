@@ -3,6 +3,7 @@ import { CustomersTypeormRepository } from '@/customers/infrastructure/typeorm/r
 import { container } from 'tsyringe'
 import { Customer } from '../typeorm/entities/customers.entity'
 import { CreateCustomerUseCase } from '@/customers/application/usecases/create-customer.usecase'
+import { SearchCustomerUseCase } from '@/customers/application/usecases/search-customer.usecase'
 
 container.registerSingleton('CustomersRepository', CustomersTypeormRepository)
 container.registerInstance(
@@ -12,4 +13,9 @@ container.registerInstance(
 container.registerSingleton(
   'CreateCustomerUseCase',
   CreateCustomerUseCase.UseCase,
+)
+
+container.registerSingleton(
+  'SearchCustomerUseCase',
+  SearchCustomerUseCase.UseCase,
 )
