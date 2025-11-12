@@ -75,6 +75,53 @@ const customersRouter = Router()
  */
 customersRouter.post('/', isAuthenticated, createCustomerController)
 
+/**
+ * @swagger
+ * /customers:
+ *   get:
+ *     summary: Returns a paginated list of customers
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: The page number to retrieve
+ *       - in: query
+ *         name: per_page
+ *         schema:
+ *           type: integer
+ *           default: 15
+ *         description: Number of items per page
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           default: null
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sort_dir
+ *         schema:
+ *           type: string
+ *           default: null
+ *         description: Sort direction (asc or desc)
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *           default: null
+ *         description: Filter string to search for specific customers
+ *     responses:
+ *       200:
+ *         description: A paginated list of customers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CustomerListResponse'
+ *       401:
+ *         description: Unauthorized
+ */
 customersRouter.get('/', isAuthenticated, searchCustomerController)
 
 export { customersRouter }
