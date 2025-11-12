@@ -125,6 +125,31 @@ customersRouter.post('/', isAuthenticated, createCustomerController)
  */
 customersRouter.get('/', isAuthenticated, searchCustomerController)
 
+/**
+ * @swagger
+ * /customers/{id}:
+ *   get:
+ *     summary: Get the customer by id
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The customer id
+ *     responses:
+ *       200:
+ *         description: The customer description by id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Customer'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Poduct not found using ID {id}
+ */
 customersRouter.get('/:id', isAuthenticated, getCustomerController)
 
 export { customersRouter }
