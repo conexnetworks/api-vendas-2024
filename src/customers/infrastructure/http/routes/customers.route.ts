@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { createCustomerController } from '../controllers/create-customer.controller'
 import { isAuthenticated } from '@/common/infrastructure/http/middlewares/isAuthenticated'
 import { searchCustomerController } from '../controllers/search-customer.controller'
+import { getCustomerController } from '../controllers/get-customer.controller'
 
 const customersRouter = Router()
 
@@ -123,5 +124,7 @@ customersRouter.post('/', isAuthenticated, createCustomerController)
  *         description: Unauthorized
  */
 customersRouter.get('/', isAuthenticated, searchCustomerController)
+
+customersRouter.get('/:id', isAuthenticated, getCustomerController)
 
 export { customersRouter }
