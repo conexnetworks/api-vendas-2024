@@ -11,6 +11,7 @@ import { inject } from 'tsyringe'
 import { Repository } from 'typeorm'
 import { Order } from '../entities/orders.entity'
 import { ProductsTypeormRepository } from '@/products/infrastructure/typeorm/repositories/products-typeorm.repository'
+import { NotFoundError } from '@/common/domain/errors/not-found-error'
 
 export class OrdersTypeormRepository implements OrdersRepository {
   constructor(
@@ -36,7 +37,7 @@ export class OrdersTypeormRepository implements OrdersRepository {
   }
 
   findById(id: string): Promise<OrderModel> {
-    throw new Error('Method not implemented.')
+    return this._get(id)
   }
 
   update(model: OrderModel): Promise<OrderModel> {
@@ -49,5 +50,19 @@ export class OrdersTypeormRepository implements OrdersRepository {
 
   search(props: SearchInput): Promise<SearchOutput<OrderModel>> {
     throw new Error('Method not implemented.')
+  }
+
+  protected async _get(id: string): Promise<OrderModel> {
+    const order = await this.ordersRepository.findOne({
+      where: { id },
+      relations: {
+        customer: true,
+        order_products: true,
+      },
+    })
+    if (!order) {
+      throw new NotFoundError(`Order not found using ID ${id}`)
+    }
+    return order
   }
 }
