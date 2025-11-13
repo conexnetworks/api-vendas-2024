@@ -1,9 +1,10 @@
+import { Router } from 'express'
 import { customersRouter } from '@/customers/infrastructure/http/routes/customers.route'
+import { ordersRouter } from '@/orders/infrastructure/http/routes/orders.route'
 import { productsRouter } from '@/products/infrastructure/http/routes/products.route'
 import { authRouter } from '@/users/infrastructure/http/routes/auth.route'
 import { passwordRouter } from '@/users/infrastructure/http/routes/password.route'
 import { usersRouter } from '@/users/infrastructure/http/routes/users.route'
-import { Router } from 'express'
 
 const routes = Router()
 
@@ -20,5 +21,7 @@ routes.use('/users', usersRouter)
 routes.use('/password', passwordRouter)
 
 routes.use('/customers', customersRouter)
+
+routes.use('/orders', ordersRouter)
 
 export { routes }
