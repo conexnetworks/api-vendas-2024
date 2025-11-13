@@ -1,5 +1,4 @@
 import { Customer } from '@/customers/infrastructure/typeorm/entities/customers.entity'
-import { OrderProductModel } from '@/orders/domain/models/orders-products.model'
 import { OrderModel } from '@/orders/domain/models/orders.model'
 import {
   Entity,
@@ -9,7 +8,9 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm'
+import { OrderProduct } from './orders-products.entity'
 
 @Entity('orders')
 export class Order implements OrderModel {
@@ -23,7 +24,10 @@ export class Order implements OrderModel {
   @JoinColumn({ name: 'customer_id' })
   customer: Customer
 
-  order_products: OrderProductModel[]
+  @OneToMany(() => OrderProduct, order_products => order_products.order, {
+    cascade: true,
+  })
+  order_products: OrderProduct[]
 
   @CreateDateColumn()
   created_at: Date
