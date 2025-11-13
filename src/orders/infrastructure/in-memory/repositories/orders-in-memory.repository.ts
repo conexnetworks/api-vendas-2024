@@ -1,4 +1,6 @@
+import { randomUUID } from 'node:crypto'
 import { AppError } from '@/common/domain/errors/app-error'
+import { BadRequestError } from '@/common/domain/errors/bad-request-error'
 import { InMemoryRepository } from '@/common/domain/repositories/in-memory.repository'
 import { OrderModel } from '@/orders/domain/models/orders.model'
 import {
@@ -10,11 +12,27 @@ export class OrdersInMemoryRepository
   extends InMemoryRepository<OrderModel>
   implements OrdersRepository
 {
-  createOrder(
+  async createOrder(
     connection: any,
-    { customer, products }: CreateOrderProps,
+    props: CreateOrderProps,
   ): Promise<OrderModel> {
-    throw new Error('Method not implemented.')
+    const { customer, products } = props
+    if (!customer || products.length <= 0) {
+      throw new BadRequestError('Input data not provided or invalid')
+    }
+    const order = {
+      id: randomUUID(),
+      customer_id: customer.id,
+      order_products: products.map(product => {
+        return {
+          product_id: product.id,
+          quantity: product.quantity,
+          price: product.price,
+        }
+      }),
+    } as OrderModel
+    this.items.push(order)
+    return order
   }
 
   protected applyFilter(
