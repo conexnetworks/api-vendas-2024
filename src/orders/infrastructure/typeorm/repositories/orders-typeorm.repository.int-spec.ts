@@ -7,6 +7,8 @@ import { Order } from '../entities/orders.entity'
 import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { CustomersDataBuilder } from '@/customers/infrastructure/testing/helpers/customers-data-builder'
 import { OrdersDataBuilder } from '../../testing/helpers/orders-data-builder'
+import { BadRequestError } from '@/common/domain/errors/bad-request-error'
+import { CreateOrderProps } from '@/orders/domain/repositories/orders.repository'
 
 describe('OrdersTypeormRepository Integration Tests', () => {
   let ordersRepository: OrdersTypeormRepository
@@ -80,5 +82,46 @@ describe('OrdersTypeormRepository Integration Tests', () => {
     const result = await ordersRepository.findById(order.id)
     expect(result.id).toBeDefined()
     expect(result.customer_id).toEqual(data.customer.id)
+  })
+
+  test('should create a new order and update product quantities - createOrder', async () => {
+    const orderData: CreateOrderProps = {
+      customer,
+      products: [
+        {
+          ...product1,
+          quantity: 1,
+        },
+        {
+          ...product2,
+          quantity: 2,
+        },
+      ],
+    }
+    const result = await ordersRepository.createOrder(testDataSource, orderData)
+    expect(result).toBeDefined()
+    expect(result.order_products).toHaveLength(2)
+
+    //Verificar se as quantidades dos produtos foram atualizadas
+    const updatedProduct1 = await productsRepository.findById(product1.id)
+    const updatedProduct2 = await productsRepository.findById(product2.id)
+    expect(updatedProduct1.quantity).toBe(49)
+    expect(updatedProduct2.quantity).toBe(18)
+  })
+
+  test('should generate an error when the transaction is not completed', async () => {
+    const orderData: CreateOrderProps = {
+      customer,
+      products: [{ ...product1, quantity: 51 }],
+    }
+    await expect(
+      ordersRepository.createOrder(testDataSource, orderData),
+    ).rejects.toThrow(
+      new BadRequestError(`Product ${product1.id} is out of stock`),
+    )
+
+    //Verificar se a quantidade do produto ficou inalterada
+    const product = await productsRepository.findById(product1.id)
+    expect(product.quantity).toBe(50)
   })
 })
