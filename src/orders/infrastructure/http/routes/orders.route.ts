@@ -72,6 +72,31 @@ const ordersRouter = Router()
  */
 ordersRouter.post('/', isAuthenticated, createOrderController)
 
+/**
+ * @swagger
+ * /orders/{id}:
+ *   get:
+ *     summary: Get the order by id
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The order id
+ *     responses:
+ *       200:
+ *         description: The order description by id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Order'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Order not found using ID {id}
+ */
 ordersRouter.get('/:id', isAuthenticated, getOrderController)
 
 export { ordersRouter }
