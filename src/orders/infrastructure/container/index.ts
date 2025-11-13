@@ -3,6 +3,7 @@ import { OrdersTypeormRepository } from '../typeorm/repositories/orders-typeorm.
 import { dataSource } from '@/common/infrastructure/typeorm'
 import { Order } from '../typeorm/entities/orders.entity'
 import { CreateOrderUseCase } from '@/orders/application/usecases/create-order.usecase'
+import { GetOrderUseCase } from '@/orders/application/usecases/get-order.usecase'
 
 container.registerSingleton('OrdersRepository', OrdersTypeormRepository)
 container.registerInstance(
@@ -11,3 +12,5 @@ container.registerInstance(
 )
 
 container.registerSingleton('CreateOrderUseCase', CreateOrderUseCase.UseCase)
+
+container.registerSingleton('GetOrderUseCase', GetOrderUseCase.UseCase)
