@@ -39,6 +39,36 @@ const customersRouter = Router()
  *         email: samplecustomer@mail.com
  *         created_at: 2023-01-01T10:00:00Z
  *         updated_at: 2023-01-01T10:00:00Z
+ *     CustomerListResponse:
+ *       type: object
+ *       properties:
+ *         items:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Customer'
+ *         total:
+ *           type: integer
+ *           description: Total number of customers
+ *         current_page:
+ *           type: integer
+ *           description: Current page number
+ *         last_page:
+ *           type: integer
+ *           description: Last page number
+ *         per_page:
+ *           type: integer
+ *           description: Number of items per page
+ *       example:
+ *         items:
+ *           - id: 06db518e-613b-4a76-8e4f-2e305fe4f68d
+ *             name: Sample Customer
+ *             email: samplecustomer@mail.com
+ *             created_at: 2023-01-01T10:00:00Z
+ *             updated_at: 2023-01-01T10:00:00Z
+ *         total: 150
+ *         current_page: 1
+ *         last_page: 10
+ *         per_page: 15
  */
 
 /**
