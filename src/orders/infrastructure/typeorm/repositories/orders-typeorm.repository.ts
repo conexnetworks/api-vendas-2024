@@ -10,6 +10,7 @@ import {
 import { inject, injectable } from 'tsyringe'
 import { DataSource, Repository } from 'typeorm'
 import { Order } from '../entities/orders.entity'
+import { Product } from '@/products/infrastructure/typeorm/entities/products.entity'
 import { ProductsTypeormRepository } from '@/products/infrastructure/typeorm/repositories/products-typeorm.repository'
 import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { BadRequestError } from '@/common/domain/errors/bad-request-error'
@@ -35,14 +36,29 @@ export class OrdersTypeormRepository implements OrdersRepository {
         price: product.price,
       }))
 
-      // Verificar estoque de cada produto
+      // Ler cada produto dentro da transação, com trava de escrita, em ordem de id
+      const productIds = [
+        ...new Set(serializedOrderProducts.map(p => p.product_id)),
+      ].sort()
+      const lockedProducts = new Map<string, Product>()
+      for (const productId of productIds) {
+        const product = await transactionalEntityManager.findOne(Product, {
+          where: { id: productId },
+          lock: { mode: 'pessimistic_write' },
+        })
+        if (!product) {
+          throw new NotFoundError(`Product not found using ID ${productId}`)
+        }
+        lockedProducts.set(productId, product)
+      }
+
+      // Verificar e baixar o estoque de cada item
       for (const serializedOrderProduct of serializedOrderProducts) {
-        const product = await this.productsRepository.findById(
-          serializedOrderProduct.product_id,
-        )
+        const product = lockedProducts.get(serializedOrderProduct.product_id)
         if (serializedOrderProduct.quantity > product.quantity) {
           throw new BadRequestError(`Product ${product.id} is out of stock`)
         }
+        product.quantity -= serializedOrderProduct.quantity
       }
 
       // Criar pedido
@@ -53,11 +69,7 @@ export class OrdersTypeormRepository implements OrdersRepository {
       const order = await transactionalEntityManager.save(newOrder)
 
       // Atualizar estoque de cada produto
-      for (const product of requestedProducts) {
-        const productUpdate = await this.productsRepository.findById(product.id)
-        productUpdate.quantity -= product.quantity
-        await transactionalEntityManager.save(productUpdate)
-      }
+      await transactionalEntityManager.save([...lockedProducts.values()])
 
       return order
     })

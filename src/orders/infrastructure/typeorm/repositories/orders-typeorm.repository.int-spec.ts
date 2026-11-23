@@ -124,4 +124,28 @@ describe('OrdersTypeormRepository Integration Tests', () => {
     const product = await productsRepository.findById(product1.id)
     expect(product.quantity).toBe(50)
   })
+
+  test('should not sell more than the stock with concurrent orders - createOrder', async () => {
+    const orderData: CreateOrderProps = {
+      customer,
+      products: [{ ...product1, quantity: 30 }],
+    }
+
+    const results = await Promise.allSettled([
+      ordersRepository.createOrder(testDataSource, orderData),
+      ordersRepository.createOrder(testDataSource, orderData),
+    ])
+
+    const fulfilled = results.filter(r => r.status === 'fulfilled')
+    const rejected = results.filter(r => r.status === 'rejected')
+    expect(fulfilled).toHaveLength(1)
+    expect(rejected).toHaveLength(1)
+    expect((rejected[0] as PromiseRejectedResult).reason).toEqual(
+      new BadRequestError(`Product ${product1.id} is out of stock`),
+    )
+
+    //Verificar se o estoque nunca fica abaixo do que foi vendido
+    const product = await productsRepository.findById(product1.id)
+    expect(product.quantity).toBe(20)
+  })
 })
