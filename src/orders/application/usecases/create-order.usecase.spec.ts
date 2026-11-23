@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { randomUUID } from 'node:crypto'
 import { BadRequestError } from '@/common/domain/errors/bad-request-error'
 import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { CreateOrderUseCase } from './create-order.usecase'
@@ -88,6 +89,26 @@ describe('CreateOrderUseCase Unit Tests', () => {
 
     await expect(async () => sut.execute(orderProps)).rejects.toThrow(
       new BadRequestError('Product data not provided or invalid'),
+    )
+  })
+
+  test('should throws error when one of the products is not found', async () => {
+    const customer = await customersRepository.insert(customerData)
+    const product = await productsRepository.insert(productData)
+    const missingProductId = randomUUID()
+    const orderProps = {
+      customer_id: customer.id,
+      products: [
+        { id: product.id, quantity: 1 },
+        { id: missingProductId, quantity: 1 },
+      ],
+    }
+    await expect(async () => sut.execute(orderProps)).rejects.toBeInstanceOf(
+      NotFoundError,
+    )
+
+    await expect(async () => sut.execute(orderProps)).rejects.toThrow(
+      new NotFoundError(`Product not found using ID ${missingProductId}`),
     )
   })
 

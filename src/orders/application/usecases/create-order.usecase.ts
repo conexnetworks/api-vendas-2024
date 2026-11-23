@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe'
 import { BadRequestError } from '@/common/domain/errors/bad-request-error'
+import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { dataSource } from '@/common/infrastructure/typeorm'
 import { CustomersRepository } from '@/customers/domain/repositories/customers.repository'
 import { OrdersRepository } from '@/orders/domain/repositories/orders.repository'
@@ -36,6 +37,15 @@ export namespace CreateOrderUseCase {
 
       if (productsFound.length <= 0) {
         throw new BadRequestError('Product data not provided or invalid')
+      }
+
+      const missingProduct = input.products.find(
+        requested => !productsFound.some(found => found.id === requested.id),
+      )
+      if (missingProduct) {
+        throw new NotFoundError(
+          `Product not found using ID ${missingProduct.id}`,
+        )
       }
 
       const orderProducts = await Promise.all(
