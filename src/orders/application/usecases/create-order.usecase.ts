@@ -19,7 +19,7 @@ export namespace CreateOrderUseCase {
       private ordersRepository: OrdersRepository,
       @inject('CustomersRepository')
       private customersRepository: CustomersRepository,
-      @inject('ProductsRepository')
+      @inject('ProductRepository')
       private productsRepository: ProductsRepository,
     ) {}
     async execute(input: Input): Promise<Output> {

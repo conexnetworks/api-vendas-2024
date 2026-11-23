@@ -7,18 +7,19 @@ import {
   CreateOrderProps,
   OrdersRepository,
 } from '@/orders/domain/repositories/orders.repository'
-import { inject } from 'tsyringe'
+import { inject, injectable } from 'tsyringe'
 import { DataSource, Repository } from 'typeorm'
 import { Order } from '../entities/orders.entity'
 import { ProductsTypeormRepository } from '@/products/infrastructure/typeorm/repositories/products-typeorm.repository'
 import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { BadRequestError } from '@/common/domain/errors/bad-request-error'
 
+@injectable()
 export class OrdersTypeormRepository implements OrdersRepository {
   constructor(
     @inject('OrdersDefaultRepositoryTypeorm')
     private ordersRepository: Repository<Order>,
-    @inject('ProductsRepository')
+    @inject('ProductRepository')
     private productsRepository: ProductsTypeormRepository,
   ) {}
 
