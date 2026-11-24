@@ -26,6 +26,17 @@ services:
       - '1025:1025'
       - '8025:8025'
 
+  localstack:
+    image: localstack/localstack:4.14.0
+    container_name: localstack
+    profiles: ['aws']
+    environment:
+      - SERVICES=ses
+    ports:
+      - '4566:4566'
+    volumes:
+      - ./localstack/verify-ses-identity.sh:/etc/localstack/init/ready.d/verify-ses-identity.sh
+
 volumes:
   postgres_data:
     driver: local
