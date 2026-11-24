@@ -34,6 +34,7 @@ export namespace ResetPasswordUseCase {
 
       user.password = await this.hashProvider.generateHash(input.password)
       await this.usersRepository.update(user)
+      await this.userTokensRepository.delete(userToken.id)
     }
   }
 }
