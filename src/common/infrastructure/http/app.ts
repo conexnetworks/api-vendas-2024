@@ -1,3 +1,4 @@
+import path from 'node:path'
 import express from 'express'
 import 'express-async-errors'
 import cors from 'cors'
@@ -14,7 +15,8 @@ const options = {
       version: '1.0.0',
     },
   },
-  apis: ['./src/**/http/routes/*.ts'],
+  // as rotas em src (.ts) com o ts-node-dev e em dist (.js) no código compilado
+  apis: [path.resolve(__dirname, '..', '..', '..', '**/http/routes/*.{ts,js}')],
 }
 const swaggerSpec = swaggerJSDoc(options)
 
