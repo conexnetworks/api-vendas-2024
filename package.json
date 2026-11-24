@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "test": "npx dotenv-cli -e .env.test -- jest --runInBand",
     "typeorm": "ts-node-dev -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:run:prod": "typeorm migration:run -d dist/common/infrastructure/typeorm/index.js",
     "pretest:int": "docker run --name testsdb -e POSTGRES_PASSWORD=postgres -p 5433:5432 -d postgres",
     "test:int": "npx dotenv-cli -e .env.test -- jest --runInBand --config ./jest.int.config.ts",
     "posttest:int": "docker stop testsdb && docker rm testsdb"
