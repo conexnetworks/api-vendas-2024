@@ -19,6 +19,13 @@ services:
     volumes:
       - redis_data:/data
 
+  mail:
+    image: axllent/mailpit:v1.32.0
+    container_name: mailpit
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
 volumes:
   postgres_data:
     driver: local
