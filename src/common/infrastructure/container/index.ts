@@ -8,9 +8,20 @@ import { JwtAuthProvider } from '../providers/auth-provider/auth-provider.jwt'
 import { R2Uploader } from '../providers/storage-provider/r2.uploader'
 import { RedisCache } from '../cache/redis/redis.cache'
 import { RedisCacheRepository } from '../cache/redis/redis.repository'
+import { RateLimiterRedis } from 'rate-limiter-flexible'
 
 container.registerSingleton('HashProvider', BcryptjsHashProvider)
 container.registerSingleton('AuthProvider', JwtAuthProvider)
 container.registerSingleton('UploaderProvider', R2Uploader)
 container.registerSingleton('RedisCache', RedisCache)
 container.registerSingleton('CacheRepository', RedisCacheRepository)
+
+container.register('RateLimiterRedis', {
+  useValue: new RateLimiterRedis({
+    storeClient: container.resolve('RedisCache'),
+    keyPrefix: 'rate-limit:',
+    points: 5, // Limite de 5 pontos por IP
+    duration: 1, // Período de tempo (em segundos)
+    blockDuration: 60, // Bloqueio de 1 minuto (em segundos) se o limite for excedido
+  }),
+})

@@ -5,8 +5,11 @@ import { productsRouter } from '@/products/infrastructure/http/routes/products.r
 import { authRouter } from '@/users/infrastructure/http/routes/auth.route'
 import { passwordRouter } from '@/users/infrastructure/http/routes/password.route'
 import { usersRouter } from '@/users/infrastructure/http/routes/users.route'
+import { rateLimiter } from './middlewares/rateLimiter'
 
 const routes = Router()
+
+routes.use(rateLimiter)
 
 routes.get('/', (req, res) => {
   return res.status(200).json({ message: 'Olá Dev!' })
