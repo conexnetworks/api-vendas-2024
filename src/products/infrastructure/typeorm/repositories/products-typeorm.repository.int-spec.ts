@@ -6,9 +6,11 @@ import { randomUUID } from 'crypto'
 import { ProductsDataBuilder } from '../../testing/helpers/products-data-builder'
 import { ConflictError } from '@/common/domain/errors/conflict-error'
 import { ProductModel } from '@/products/domain/models/products.model'
+import { CacheInMemoryRepository } from '@/common/infrastructure/cache/in-memory/cache-in-memory.repository'
 
 describe('ProductsTypeormRepository integration tests', () => {
   let ormRepository: ProductsTypeormRepository
+  let cacheRepository: CacheInMemoryRepository
   let typeormEntityManager: any
 
   beforeAll(async () => {
@@ -22,8 +24,10 @@ describe('ProductsTypeormRepository integration tests', () => {
 
   beforeEach(async () => {
     await testDataSource.manager.query('DELETE FROM products')
+    cacheRepository = new CacheInMemoryRepository()
     ormRepository = new ProductsTypeormRepository(
       typeormEntityManager.getRepository(Product),
+      cacheRepository,
     )
   })
 
@@ -282,6 +286,50 @@ describe('ProductsTypeormRepository integration tests', () => {
       expect(result.items[0].name).toEqual('TEST')
       expect(result.items.length).toEqual(1)
       expect(result.total).toEqual(3)
+    })
+  })
+
+  describe('search cache', () => {
+    const searchProps = {
+      page: 1,
+      per_page: 15,
+      sort: null,
+      sort_dir: null,
+      filter: null,
+    }
+    const key = 'products:1:15:null:null:null'
+
+    it('should save the search result in the cache', async () => {
+      const product = testDataSource.manager.create(
+        Product,
+        ProductsDataBuilder({}),
+      )
+      await testDataSource.manager.save(product)
+
+      await ormRepository.search(searchProps)
+
+      const cachedItems = JSON.parse(await cacheRepository.get(key))
+      expect(cachedItems).toHaveLength(1)
+      expect(cachedItems[0].id).toEqual(product.id)
+      expect(await cacheRepository.get(`${key}:total`)).toEqual('1')
+    })
+
+    it('should return the cached result without querying the database', async () => {
+      const product = testDataSource.manager.create(
+        Product,
+        ProductsDataBuilder({}),
+      )
+      await testDataSource.manager.save(product)
+      await ormRepository.search(searchProps)
+      await testDataSource.manager.query('DELETE FROM products')
+
+      const result = await ormRepository.search(searchProps)
+
+      expect(result.total).toEqual(1)
+      expect(result.items).toHaveLength(1)
+      expect(result.items[0].id).toEqual(product.id)
+      expect(result.sort).toEqual('created_at')
+      expect(result.sort_dir).toEqual('desc')
     })
   })
 })

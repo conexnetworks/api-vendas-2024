@@ -9,6 +9,7 @@ import { CustomersDataBuilder } from '@/customers/infrastructure/testing/helpers
 import { OrdersDataBuilder } from '../../testing/helpers/orders-data-builder'
 import { BadRequestError } from '@/common/domain/errors/bad-request-error'
 import { CreateOrderProps } from '@/orders/domain/repositories/orders.repository'
+import { CacheInMemoryRepository } from '@/common/infrastructure/cache/in-memory/cache-in-memory.repository'
 
 describe('OrdersTypeormRepository Integration Tests', () => {
   let ordersRepository: OrdersTypeormRepository
@@ -34,6 +35,7 @@ describe('OrdersTypeormRepository Integration Tests', () => {
     await testDataSource.manager.query('DELETE FROM products')
     productsRepository = new ProductsTypeormRepository(
       typeormEntityManager.getRepository(Product),
+      new CacheInMemoryRepository(),
     )
     ordersRepository = new OrdersTypeormRepository(
       typeormEntityManager.getRepository(Order),

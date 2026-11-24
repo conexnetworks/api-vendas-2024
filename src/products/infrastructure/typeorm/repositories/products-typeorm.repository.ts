@@ -13,6 +13,7 @@ import { Product } from '../entities/products.entity'
 import { NotFoundError } from '@/common/domain/errors/not-found-error'
 import { ConflictError } from '@/common/domain/errors/conflict-error'
 import { inject, injectable } from 'tsyringe'
+import { CacheRepository } from '@/common/infrastructure/cache/cache.repository'
 
 @injectable()
 export class ProductsTypeormRepository implements ProductsRepository {
@@ -21,6 +22,8 @@ export class ProductsTypeormRepository implements ProductsRepository {
   constructor(
     @inject('ProductsDefaultTypeormRepository')
     private productsRepository: Repository<Product>,
+    @inject('CacheRepository')
+    private cacheRepository: CacheRepository,
   ) {}
 
   async findByName(name: string): Promise<ProductModel> {
@@ -79,12 +82,33 @@ export class ProductsTypeormRepository implements ProductsRepository {
     const orderByField = validSort ? props.sort : 'created_at'
     const orderByDir = validSortDir ? props.sort_dir : 'desc'
 
+    const key = `products:${props.page}:${props.per_page}:${props.sort}:${props.sort_dir}:${props.filter}`
+    const hasTotal = await this.cacheRepository.get(`${key}:total`)
+    const hasCachedData = await this.cacheRepository.get(key)
+
+    if (hasCachedData && hasTotal) {
+      console.log('Fetching data from redis')
+      return {
+        items: JSON.parse(hasCachedData),
+        per_page: props.per_page,
+        total: parseInt(hasTotal),
+        current_page: props.page,
+        sort: orderByField,
+        sort_dir: orderByDir,
+        filter: props.filter,
+      }
+    }
+
+    console.log('Fetching data from database')
     const [products, total] = await this.productsRepository.findAndCount({
       ...(props.filter && { where: { name: ILike(`%${props.filter}%`) } }),
       order: { [orderByField]: orderByDir },
       skip: (props.page - 1) * props.per_page,
       take: props.per_page,
     })
+
+    await this.cacheRepository.set(key, JSON.stringify(products))
+    await this.cacheRepository.set(`${key}:total`, total.toString())
 
     return {
       items: products,

@@ -7,8 +7,10 @@ import { BcryptjsHashProvider } from '../providers/hash-provider/bcryptjs-hash.p
 import { JwtAuthProvider } from '../providers/auth-provider/auth-provider.jwt'
 import { R2Uploader } from '../providers/storage-provider/r2.uploader'
 import { RedisCache } from '../cache/redis/redis.cache'
+import { RedisCacheRepository } from '../cache/redis/redis.repository'
 
 container.registerSingleton('HashProvider', BcryptjsHashProvider)
 container.registerSingleton('AuthProvider', JwtAuthProvider)
 container.registerSingleton('UploaderProvider', R2Uploader)
 container.registerSingleton('RedisCache', RedisCache)
+container.registerSingleton('CacheRepository', RedisCacheRepository)
