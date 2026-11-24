@@ -3,7 +3,8 @@ import { SendEmailToResetPasswordUseCase } from '@/users/application/usecases/se
 import { Request, Response } from 'express'
 import { container } from 'tsyringe'
 import { z } from 'zod'
-import { sendMailToResetPassword } from '../../email/nodemailer/sendMailToResetPassword'
+import { MailProvider } from '@/common/domain/providers/mail-provider'
+import { sendMailToResetPassword } from '../../email/sendMailToResetPassword'
 
 export async function sendEmailToResetPasswordController(
   request: Request,
@@ -21,9 +22,8 @@ export async function sendEmailToResetPasswordController(
     email,
   })
 
-  await sendMailToResetPassword({ user, token })
-  // console.log('user: ', user)
-  // console.log('token: ', token)
+  const mailProvider: MailProvider = container.resolve('MailProvider')
+  await sendMailToResetPassword(mailProvider, { user, token })
 
   return response.status(204).json()
 }
