@@ -1,4 +1,5 @@
-# Compose de produção: a API, o Postgres e o Redis, sem nenhuma porta publicada.
+# Compose de produção: o Caddy na frente da API, do Postgres e do Redis.
+# Só o Caddy publica portas (80 e 443); os outros serviços ficam na rede interna do compose.
 # Uso: docker compose --env-file .env.production -f compose.prod.yaml up -d --build
 
 # Nome próprio: sem ele, o projeto teria o nome da pasta, o mesmo do compose de desenvolvimento, e os dois
@@ -15,6 +16,19 @@ services:
     depends_on:
       db: { condition: service_healthy }
       cache: { condition: service_started }
+
+  caddy:
+    image: caddy:2.11.9
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
 
   db:
     image: postgres:17.12-alpine
@@ -48,3 +62,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
+  caddy_config:

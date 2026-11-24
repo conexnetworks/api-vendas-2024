@@ -1,0 +1,17 @@
+{
+	# a CA interna fica no volume do Caddy; o certificado raiz é exportado à mão (sem instalar no sistema)
+	skip_install_trust
+}
+
+api.localhost {
+	tls internal
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+	reverse_proxy api:3333
+}
