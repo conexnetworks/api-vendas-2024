@@ -6,3 +6,4 @@ coverage
 docs
 localstack
 *.log
+infra

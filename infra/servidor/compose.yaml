@@ -1,0 +1,23 @@
+# O servidor de produção local: um Ubuntu com SSH e Docker, como uma VPS recém-criada.
+# Uso: docker compose -f infra/servidor/compose.yaml up -d --build
+
+services:
+  servidor:
+    build: .
+    image: api-vendas-servidor
+    hostname: servidor
+    restart: unless-stopped
+    # o Docker que roda dentro do servidor (Docker-in-Docker) precisa do modo privilegiado
+    privileged: true
+    ports:
+      - '2222:22'
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./chave/id_ed25519.pub:/run/chave.pub:ro
+      - docker_data:/var/lib/docker
+      - deploy_home:/home/deploy
+
+volumes:
+  docker_data:
+  deploy_home:

@@ -40,3 +40,5 @@ lerna-debug.log*
 .env.production
 .env.local
 tsconfig.tsbuildinfo
+# chave SSH do servidor de produção local
+infra/servidor/chave/
