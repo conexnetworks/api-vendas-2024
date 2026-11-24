@@ -60,4 +60,14 @@ describe('RedisCacheRepository unit tests', () => {
       expect(redisCacheMock.del).toHaveBeenCalledWith(key)
     })
   })
+
+  describe('keys', () => {
+    it('should call redis.keys with the correct pattern', async () => {
+      const pattern = 'test_pattern'
+
+      await repository.keys(pattern)
+
+      expect(redisCacheMock.keys).toHaveBeenCalledWith(pattern)
+    })
+  })
 })

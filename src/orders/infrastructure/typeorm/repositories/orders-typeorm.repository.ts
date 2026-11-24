@@ -26,6 +26,16 @@ export class OrdersTypeormRepository implements OrdersRepository {
 
   async createOrder(
     connection: DataSource,
+    props: CreateOrderProps,
+  ): Promise<OrderModel> {
+    const order = await this.createOrderTransaction(connection, props)
+    // O estoque mudou: a listagem de produtos em cache ficou desatualizada
+    await this.productsRepository.invalidateCache()
+    return order
+  }
+
+  private async createOrderTransaction(
+    connection: DataSource,
     { customer, products: requestedProducts }: CreateOrderProps,
   ): Promise<OrderModel> {
     return connection.manager.transaction(async transactionalEntityManager => {

@@ -56,7 +56,9 @@ export class ProductsTypeormRepository implements ProductsRepository {
   }
 
   async insert(model: ProductModel): Promise<ProductModel> {
-    return this.productsRepository.save(model)
+    const newProduct = await this.productsRepository.save(model)
+    await this.invalidateCache()
+    return newProduct
   }
 
   async findById(id: string): Promise<ProductModel> {
@@ -66,12 +68,14 @@ export class ProductsTypeormRepository implements ProductsRepository {
   async update(model: ProductModel): Promise<ProductModel> {
     await this._get(model.id)
     await this.productsRepository.update({ id: model.id }, model)
+    await this.invalidateCache()
     return model
   }
 
   async delete(id: string): Promise<void> {
     await this._get(id)
     await this.productsRepository.delete({ id })
+    await this.invalidateCache()
   }
 
   async search(props: SearchInput): Promise<SearchOutput<ProductModel>> {
@@ -127,5 +131,12 @@ export class ProductsTypeormRepository implements ProductsRepository {
       throw new NotFoundError(`Product not found using ID ${id}`)
     }
     return product
+  }
+
+  async invalidateCache(): Promise<void> {
+    const keys = await this.cacheRepository.keys(`products:*`)
+    for (const key of keys) {
+      await this.cacheRepository.delete(key)
+    }
   }
 }

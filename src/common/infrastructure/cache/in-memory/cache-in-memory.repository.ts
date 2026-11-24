@@ -14,4 +14,10 @@ export class CacheInMemoryRepository implements CacheRepository {
   async delete(key: string): Promise<void> {
     this.items.delete(key)
   }
+
+  async keys(pattern: string): Promise<string[]> {
+    const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`^${escaped.replace(/\*/g, '.*')}$`)
+    return [...this.items.keys()].filter(key => regex.test(key))
+  }
 }

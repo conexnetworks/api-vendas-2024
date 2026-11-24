@@ -14,6 +14,7 @@ import { CacheInMemoryRepository } from '@/common/infrastructure/cache/in-memory
 describe('OrdersTypeormRepository Integration Tests', () => {
   let ordersRepository: OrdersTypeormRepository
   let productsRepository: ProductsTypeormRepository
+  let cacheRepository: CacheInMemoryRepository
   let typeormEntityManager: any
   let customer: Customer
   let product1: Product
@@ -33,9 +34,10 @@ describe('OrdersTypeormRepository Integration Tests', () => {
     await testDataSource.manager.query('DELETE FROM orders')
     await testDataSource.manager.query('DELETE FROM customers')
     await testDataSource.manager.query('DELETE FROM products')
+    cacheRepository = new CacheInMemoryRepository()
     productsRepository = new ProductsTypeormRepository(
       typeormEntityManager.getRepository(Product),
-      new CacheInMemoryRepository(),
+      cacheRepository,
     )
     ordersRepository = new OrdersTypeormRepository(
       typeormEntityManager.getRepository(Order),
@@ -109,6 +111,19 @@ describe('OrdersTypeormRepository Integration Tests', () => {
     const updatedProduct2 = await productsRepository.findById(product2.id)
     expect(updatedProduct1.quantity).toBe(49)
     expect(updatedProduct2.quantity).toBe(18)
+  })
+
+  test('should invalidate the products cache when an order is created - createOrder', async () => {
+    await cacheRepository.set('products:1:15:null:null:null', '[]')
+    await cacheRepository.set('products:1:15:null:null:null:total', '0')
+    const orderData: CreateOrderProps = {
+      customer,
+      products: [{ ...product1, quantity: 1 }],
+    }
+
+    await ordersRepository.createOrder(testDataSource, orderData)
+
+    expect(await cacheRepository.keys('products:*')).toHaveLength(0)
   })
 
   test('should generate an error when the transaction is not completed', async () => {

@@ -332,4 +332,46 @@ describe('ProductsTypeormRepository integration tests', () => {
       expect(result.sort_dir).toEqual('desc')
     })
   })
+
+  describe('cache invalidation', () => {
+    const key = 'products:1:15:null:null:null'
+
+    beforeEach(async () => {
+      await cacheRepository.set(key, '[]')
+      await cacheRepository.set(`${key}:total`, '0')
+    })
+
+    it('should invalidate the products cache when a product is inserted', async () => {
+      const product = ormRepository.create(ProductsDataBuilder({}))
+
+      await ormRepository.insert(product)
+
+      expect(await cacheRepository.keys('products:*')).toHaveLength(0)
+    })
+
+    it('should invalidate the products cache when a product is updated', async () => {
+      const product = testDataSource.manager.create(
+        Product,
+        ProductsDataBuilder({}),
+      )
+      await testDataSource.manager.save(product)
+      product.name = 'updated name'
+
+      await ormRepository.update(product)
+
+      expect(await cacheRepository.keys('products:*')).toHaveLength(0)
+    })
+
+    it('should invalidate the products cache when a product is deleted', async () => {
+      const product = testDataSource.manager.create(
+        Product,
+        ProductsDataBuilder({}),
+      )
+      await testDataSource.manager.save(product)
+
+      await ormRepository.delete(product.id)
+
+      expect(await cacheRepository.keys('products:*')).toHaveLength(0)
+    })
+  })
 })
