@@ -9,14 +9,19 @@ import { R2Uploader } from '../providers/storage-provider/r2.uploader'
 import { RedisCache } from '../cache/redis/redis.cache'
 import { RedisCacheRepository } from '../cache/redis/redis.repository'
 import { RateLimiterRedis } from 'rate-limiter-flexible'
-import { SmtpMailProvider } from '../providers/mail-provider/smtp.mail-provider'
+import { mailProviderFor } from '../providers/mail-provider/mail-provider-for'
+import { env } from '../env'
+import { MailProvider } from '@/common/domain/providers/mail-provider'
 
 container.registerSingleton('HashProvider', BcryptjsHashProvider)
 container.registerSingleton('AuthProvider', JwtAuthProvider)
 container.registerSingleton('UploaderProvider', R2Uploader)
 container.registerSingleton('RedisCache', RedisCache)
 container.registerSingleton('CacheRepository', RedisCacheRepository)
-container.registerSingleton('MailProvider', SmtpMailProvider)
+container.registerSingleton<MailProvider>(
+  'MailProvider',
+  mailProviderFor(env.MAIL_DRIVER),
+)
 
 container.register('RateLimiterRedis', {
   useValue: new RateLimiterRedis({

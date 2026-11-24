@@ -21,6 +21,7 @@ const envSchema = z.object({
   REDIS_PORT: z.coerce.number().default(6379),
   REDIS_USER: z.string().optional(),
   REDIS_PASS: z.string().optional(),
+  MAIL_DRIVER: z.enum(['json', 'smtp', 'ses']).default('smtp'),
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().default(1025),
   SMTP_USER: z.string().optional(),
@@ -39,6 +40,7 @@ const envSchema = z.object({
 const _env = envSchema.safeParse(process.env)
 
 if (_env.success === false) {
+  console.error(_env.error.flatten().fieldErrors)
   throw new AppError('Invalid environment variables')
 }
 
